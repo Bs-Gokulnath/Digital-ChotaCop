@@ -32,10 +32,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<DigitalChotaCopPage />} />
+        {/* <Route path='/' element={<DigitalChotaCopPage />} />
         <Route path='/signup' element={<Signup />} />
-        <Route path='/signin' element={<Signin />} />
-        <Route path='/questions' element={<QuestionTogglePage />} />
+        <Route path='/signin' element={<Signin />} /> */}
+        <Route path='/' element={<QuestionTogglePage />} />
       </Routes>
     </BrowserRouter>
   )

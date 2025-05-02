@@ -1,128 +1,280 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
+import ImageUploader from "../components/Image_Uploader";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
+import Ex_Zone from "../components/Ex_Zone";
 
 const questions = [
-  "If on two wheeler did rider and pillion wear a helmet?",
-  "If in car did driver and passengers wear seat belts?",
-  "Did rider/driver do excessive honking?",
-  "Did rider/driver follow traffic signals?",
-  "During red signal did rider/driver stop within stop line?",
-  "Did rider/driver frequently change lanes?",
-  "Did rider/driver drive in no entry?",
-  "Did they give way to pedestrians?",
-  "If in auto did they overload the auto?",
-  "If you were on two wheeler did you triple ride?",
-  "Did your rider/driver have driving licence and insurance?"
+  "If on a bike or scooter, did everyone wear a helmet?",
+  "If in a car, did everyone wear a seatbelt?",
+  "Did the driver honk too much?",
+  "Did the driver follow traffic lights?",
+  "At a red light, did the driver stop at the white line?",
+  "Did the driver use a phone while driving?",
+  "Did the driver keep changing lanes?",
+  "Did the driver go into a \"No Entry\" road?",
+  "Did the driver stop for people walking (pedestrians)?",
+  "If in an auto, were too many people sitting inside?",
+  "If on a two-wheeler, were three people riding on it?",
+  "Did your driver have a license and insurance?",
 ];
 
-const TOTAL_RIDES = 5;
+const TOTAL_RIDES = 7;
 
 const QuestionTogglePage = () => {
-  const [activeRide, setActiveRide] = useState(0);
   const [ridesAnswers, setRidesAnswers] = useState(
-    Array(TOTAL_RIDES).fill(null).map(() => Array(questions.length).fill(false)) // Default all to false (i.e., "No")
+    Array(TOTAL_RIDES).fill(null).map(() => Array(questions.length).fill(false))
   );
   const [submittedRides, setSubmittedRides] = useState(Array(TOTAL_RIDES).fill(false));
+  const [studentInfo, setStudentInfo] = useState({
+    name: "",
+    class: "",
+    chapter: "",
+    school: "",
+    email: ""
+  });
+  const [parentRideAnswers, setParentRideAnswers] = useState(Array(TOTAL_RIDES).fill(false));
 
-  const handleToggle = (index) => {
-    if (submittedRides[activeRide]) return; // Don't allow edit after submit
-
+  const handleToggle = (rideIdx, questionIdx) => {
+    if (submittedRides[rideIdx]) return;
     const updatedAnswers = [...ridesAnswers];
-    updatedAnswers[activeRide][index] = !updatedAnswers[activeRide][index];
+    updatedAnswers[rideIdx][questionIdx] = !updatedAnswers[rideIdx][questionIdx];
     setRidesAnswers(updatedAnswers);
   };
 
-  const handleSubmit = () => {
-    const updatedSubmitted = [...submittedRides];
-    updatedSubmitted[activeRide] = true;
-    setSubmittedRides(updatedSubmitted);
-    alert(`Ride ${activeRide + 1} submitted.`);
+  const handleParentToggle = (rideIdx) => {
+    if (submittedRides[rideIdx]) return;
+    const updatedParentAnswers = [...parentRideAnswers];
+    updatedParentAnswers[rideIdx] = !updatedParentAnswers[rideIdx];
+    setParentRideAnswers(updatedParentAnswers);
   };
+
+  const handleSubmit = async () => {
+    const updatedSubmitted = submittedRides.map(() => true);
+    setSubmittedRides(updatedSubmitted);
+    await generateAndDownloadCertificate();
+  };
+
+  const generateAndDownloadCertificate = async () => {
+    const { name, school, class: studentClass } = studentInfo;
+    const tempDiv = document.createElement("div");
+    tempDiv.className =
+      "relative w-[1123px] h-[794px] bg-white shadow-lg border rounded-lg overflow-hidden";
+    tempDiv.style.width = "1123px";
+    tempDiv.style.height = "794px";
+    tempDiv.innerHTML = `
+      <img src="/assets/Chota Cop Certificate.png" 
+           alt="Certificate" 
+           style="width: 1123px; height: 794px; object-fit: cover; position: absolute; left: 0; top: 0;"/>
+      <div style="position: absolute; top: 378px; left: 345px; font-size: 24px; font-weight: bold; color: #222; width: 400px;">${name}</div>
+      <div style="position: absolute; top: 448px; left: 340px; font-size: 16px; font-weight: bold; color: #222; width: 300px;">${school}</div>
+      <div style="position: absolute; top: 438px; left: 750px; font-size: 24px; font-weight: bold; color: #222; width: 200px;">${studentClass}</div>
+    `;
+    document.body.appendChild(tempDiv);
+    await new Promise((resolve) => setTimeout(resolve, 200)); // Wait for image to load
+    html2canvas(tempDiv, { scale: 3 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("landscape", "px", [1123, 794]);
+      pdf.addImage(imgData, "PNG", 0, 0, 1123, 794);
+      pdf.save("ChotaCop_Certificate.pdf");
+      document.body.removeChild(tempDiv);
+    });
+  };
+
+  const handleInputChange = (e) => {
+    setStudentInfo({
+      ...studentInfo,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const isStudentInfoComplete = Object.values(studentInfo).every((v) => v.trim() !== "");
 
   return (
     <div className="min-h-screen bg-[#fdf5eb]">
       <Header />
-
-      <div className="w-full max-w-5xl mx-auto p-6 md:p-10">
-        {/* Ride Tabs */}
-        <div className="flex justify-center flex-wrap gap-4 mb-6">
-          {Array.from({ length: TOTAL_RIDES }, (_, idx) => {
-            const isUnlocked = idx === 0 || submittedRides[idx - 1];
-            const isActive = activeRide === idx;
-            const isSubmitted = submittedRides[idx];
-
-            return (
-              <button
-                key={idx}
-                onClick={() => isUnlocked && setActiveRide(idx)}
-                disabled={!isUnlocked}
-                className={`px-5 py-2 rounded-xl font-semibold shadow-md transition-all duration-300 ${
-                  isSubmitted
-                    ? "bg-green-500 text-white cursor-not-allowed"
-                    : isActive
-                    ? "bg-blue-600 text-white"
-                    : isUnlocked
-                    ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
-              >
-                Ride {idx + 1}
-              </button>
-            );
-          })}
+      <div className="w-full max-w-8xl mx-auto p-6 md:p-10">
+        {/* Student Info Form */}
+        <div className="bg-[#fdf6bf] shadow-xl rounded-2xl p-6 mb-8 mt-[-40px]">
+          <div className="flex flex-wrap gap-6 justify-between">
+            <input type="email" name="email" placeholder="Email" value={studentInfo.email} onChange={handleInputChange} className="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2" />
+            <select name="chapter" value={studentInfo.chapter} onChange={handleInputChange} className="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2">
+              <option value="">Select Chapter</option>
+              <option value="1">Chapter 1</option>
+              <option value="2">Chapter 2</option>
+              <option value="3">Chapter 3</option>
+            </select>
+            <input type="text" name="name" placeholder="Name" value={studentInfo.name} onChange={handleInputChange} className="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2" />
+            <input type="text" name="school" placeholder="School" value={studentInfo.school} onChange={handleInputChange} className="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2" />
+            <select name="class" value={studentInfo.class} onChange={handleInputChange} className="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2">
+              <option value="">Select Class</option>
+              {Array.from({ length: 12 }, (_, i) => (
+                <option key={i + 1} value={i + 1}>{`Class ${i + 1}`}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {/* Questions */}
-        <div className="bg-[#fdf5eb] shadow-xl rounded-2xl p-6">
-          <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">
-            Ride {activeRide + 1} – Questions
-          </h1>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {questions.map((question, idx) => {
-              const isAnswered = ridesAnswers[activeRide][idx];
-
-              return (
-                <div
-                  key={idx}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#fdf5dd] p-4 rounded-xl shadow-sm"
-                >
-                  <p className="text-gray-800 font-medium sm:w-2/3">{question}</p>
-                  <div className="flex items-center sm:w-1/3 justify-end">
+        {/* Were you riding with a parent? */}
+        <div className="bg-[#fdf5eb] shadow-xl rounded-2xl p-4 mb-8">
+          <div className="hidden md:flex items-center">
+            <p className="text-gray-800 font-semibold text-base mr-8 min-w-[260px]">Were you riding with a parent?</p>
+            <div className="flex items-center gap-18 ml-[270px]">
+              {Array.from({ length: TOTAL_RIDES }, (_, rideIdx) => {
+                const isAnswered = parentRideAnswers[rideIdx];
+                return (
+                  <div
+                    key={rideIdx}
+                    onClick={() => isStudentInfoComplete && handleParentToggle(rideIdx)}
+                    className={`relative w-14 h-6 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
+                      isAnswered ? "bg-green-500" : "bg-red-500"
+                    }`}
+                  >
+                    <span className="text-white text-xs font-bold w-1/2 text-center z-10">Yes</span>
+                    <span className="text-white text-xs font-bold w-1/2 text-center z-10">No</span>
                     <div
-                      onClick={() => handleToggle(idx)}
-                      className={`relative w-24 h-10 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-2 ${
+                      className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                        isAnswered ? "translate-x-full" : "translate-x-0"
+                      }`}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="md:hidden flex flex-col items-center gap-4">
+            <p className="text-gray-800 font-semibold text-base mb-2 text-center">Were you riding with a parent?</p>
+            <div className="flex flex-nowrap justify-center gap-3 overflow-x-auto w-full pb-2">
+              {Array.from({ length: TOTAL_RIDES }, (_, rideIdx) => {
+                const isAnswered = parentRideAnswers[rideIdx];
+                return (
+                  <div
+                    key={rideIdx}
+                    onClick={() => isStudentInfoComplete && handleParentToggle(rideIdx)}
+                    className={`relative w-12 h-5 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
+                      isAnswered ? "bg-green-500" : "bg-red-500"
+                    }`}
+                  >
+                    <div
+                      className={`absolute w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                        isAnswered ? "translate-x-7" : "translate-x-0"
+                      }`}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* MOBILE VIEW */}
+        <div className="md:hidden bg-[#fdf5eb] shadow-xl rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-2 font-bold text-gray-600 text-sm">
+            <span className="w-16">Ride</span>
+            {Array.from({ length: TOTAL_RIDES }, (_, i) => (
+              <span key={i} className="w-12 text-center">{i + 1}</span>
+            ))}
+          </div>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+              <span className="text-xs text-gray-700">Yes</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+              <span className="text-xs text-gray-700">No</span>
+            </div>
+          </div>
+          {questions.map((question, qIdx) => (
+            <div key={qIdx} className="mb-4 border-t pt-4">
+              <p className="text-gray-800 font-medium text-sm mb-2">{question}</p>
+              <div className="flex items-center gap-2">
+                {Array.from({ length: TOTAL_RIDES }, (_, rideIdx) => {
+                  const isAnswered = ridesAnswers[rideIdx][qIdx];
+                  return (
+                    <div
+                      key={rideIdx}
+                      onClick={() => isStudentInfoComplete && handleToggle(rideIdx, qIdx)}
+                      className={`relative w-10 h-5 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
                         isAnswered ? "bg-green-500" : "bg-red-500"
                       }`}
                     >
-                      <span className="text-white text-sm font-bold w-1/2 text-center z-10">Yes</span>
-                      <span className="text-white text-sm font-bold w-1/2 text-center z-10">No</span>
                       <div
-                        className={`absolute w-10 h-8 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                          isAnswered ? "translate-x-full" : "translate-x-0"
+                        className={`absolute w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                          isAnswered ? "translate-x-5" : "translate-x-0"
                         }`}
                       />
                     </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-center mt-8">
-            <button
-              onClick={handleSubmit}
-              disabled={submittedRides[activeRide]}
-              className={`px-6 py-2 font-semibold rounded-lg shadow-md transition-all duration-300 ${
-                submittedRides[activeRide]
-                  ? "bg-gray-400 text-white cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
-              }`}
-            >
-              Submit Ride {activeRide + 1}
-            </button>
-          </div>
+        {/* DESKTOP VIEW */}
+        <div className="overflow-auto hidden md:block">
+          <table className="table-auto w-full border-collapse bg-[#fdf5eb] shadow-xl rounded-2xl overflow-hidden">
+            <thead className="bg-[#fdf6bf]">
+              <tr>
+                <th className="text-left p-4 text-gray-700">Questions</th>
+                {Array.from({ length: TOTAL_RIDES }, (_, i) => (
+                  <th key={i} className="text-center p-4 text-gray-700">{`Ride ${i + 1}`}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              
+
+              {/* Main Questions */}
+              {questions.map((question, qIdx) => (
+                <tr key={qIdx} className="border-t">
+                  <td className="p-4 text-sm font-medium text-gray-800">{question}</td>
+                  {Array.from({ length: TOTAL_RIDES }, (_, rideIdx) => {
+                    const isAnswered = ridesAnswers[rideIdx][qIdx];
+                    return (
+                      <td key={rideIdx} className="p-4 text-center">
+                        <div
+                          onClick={() => isStudentInfoComplete && handleToggle(rideIdx, qIdx)}
+                          className={`relative w-14 h-6 rounded-full cursor-pointer transition-colors duration-300 mx-auto flex items-center px-1 ${
+                            isAnswered ? "bg-green-500" : "bg-red-500"
+                          }`}
+                        >
+                          <span className="text-white text-xs font-bold w-1/2 text-center z-10">Yes</span>
+                          <span className="text-white text-xs font-bold w-1/2 text-center z-10">No</span>
+                          <div
+                            className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                              isAnswered ? "translate-x-full" : "translate-x-0"
+                            }`}
+                          />
+                        </div>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Experience Zone */}
+        <Ex_Zone />
+
+        {/* PDF Upload */}
+        <ImageUploader />
+
+        {/* Submit Button */}
+        <div className="flex justify-center mt-8">
+        <button
+            onClick={handleSubmit}
+            disabled={!isStudentInfoComplete}
+            className={`px-6 py-3 rounded-xl font-bold text-white transition-colors duration-300 ${
+              isStudentInfoComplete ? "bg-green-600 hover:bg-green-700" : "bg-gray-400 cursor-not-allowed"
+            }`}
+          >
+            Submit & Get Certified
+          </button>
         </div>
       </div>
     </div>
@@ -132,146 +284,4 @@ const QuestionTogglePage = () => {
 export default QuestionTogglePage;
 
 
-// import React, { useState } from "react";
-// import Header from "../components/Header";
 
-// const questions = [
-//   "If on two wheeler did rider and pillion wear a helmet?",
-//   "If in car did driver and passengers wear seat belts?",
-//   "Did rider/driver do excessive honking?",
-//   "Did rider/driver follow traffic signals?",
-//   "During red signal did rider/driver stop within stop line?",
-//   "Did rider/driver frequently change lanes?",
-//   "Did rider/driver drive in no entry?",
-//   "Did they give way to pedestrians?",
-//   "If in auto did they overload the auto?",
-//   "If you were on two wheeler did you triple ride?",
-//   "Did your rider/driver have driving licence and insurance?"
-// ];
-
-// const TOTAL_RIDES = 5;
-
-// const QuestionTogglePage = () => {
-//   const [currentRide, setCurrentRide] = useState(0);
-//   const [answersList, setAnswersList] = useState(
-//     Array(TOTAL_RIDES).fill(null).map(() => Array(questions.length).fill(false))
-//   );
-//   const [completedRides, setCompletedRides] = useState([]);
-//   const [certificateReady, setCertificateReady] = useState(false);
-
-//   const handleToggle = (index) => {
-//     const updatedAnswers = [...answersList];
-//     updatedAnswers[currentRide][index] = !updatedAnswers[currentRide][index];
-//     setAnswersList(updatedAnswers);
-//   };
-
-//   const handleSubmit = () => {
-//     const updatedCompleted = [...completedRides, currentRide];
-//     setCompletedRides(updatedCompleted);
-
-//     if (currentRide < TOTAL_RIDES - 1) {
-//       setCurrentRide(currentRide + 1);
-//     } else {
-//       setCertificateReady(true);
-//     }
-//   };
-
-//   const renderBattery = () => {
-//     const fillPercentage = ((completedRides.length + 1) / TOTAL_RIDES) * 100;
-//     return (
-//       <div className="w-40 h-10 border-4 border-gray-700 rounded-lg relative overflow-hidden">
-//         <div
-//           className="absolute top-0 left-0 h-full bg-green-500 transition-all duration-700"
-//           style={{ width: `${fillPercentage}%` }}
-//         ></div>
-//         <div className="absolute -right-2 top-2 w-2 h-6 bg-gray-700 rounded-sm"></div>
-//       </div>
-//     );
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-[#fdf5eb]">
-//       <Header />
-
-//       <div className="max-w-5xl mx-auto p-6 md:p-10">
-//         <div className="flex justify-between items-center mb-4">
-//           <h1 className="text-2xl font-bold text-gray-800">Answer the Questions</h1>
-//           {renderBattery()}
-//         </div>
-
-//         <div className="flex gap-4 mb-6">
-//           {Array.from({ length: TOTAL_RIDES }).map((_, idx) => (
-//             <button
-//               key={idx}
-//               disabled={currentRide !== idx}
-//               className={`px-4 py-2 rounded-lg font-semibold border transition-all duration-300 ${
-//                 completedRides.includes(idx)
-//                   ? "bg-green-500 text-white border-green-600"
-//                   : currentRide === idx
-//                   ? "bg-blue-500 text-white border-blue-600"
-//                   : "bg-gray-300 text-gray-700 border-gray-400 cursor-not-allowed"
-//               }`}
-//             >
-//               Ride {idx + 1}
-//             </button>
-//           ))}
-//         </div>
-
-//         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-//           {questions.map((question, idx) => (
-//             <div
-//               key={idx}
-//               className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#fdf5dd] p-4 rounded-xl shadow-sm"
-//             >
-//               <p className="text-gray-800 font-medium sm:w-2/3">{question}</p>
-//               <div className="flex items-center sm:w-1/3 justify-end">
-//                 <div
-//                   onClick={() => handleToggle(idx)}
-//                   className={`relative w-24 h-10 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-2 ${
-//                     answersList[currentRide][idx] ? "bg-green-500" : "bg-red-500"
-//                   }`}
-//                 >
-//                   <span className="text-white text-sm font-bold w-1/2 text-center z-10">
-//                     Yes
-//                   </span>
-//                   <span className="text-white text-sm font-bold w-1/2 text-center z-10">
-//                     No
-//                   </span>
-//                   <div
-//                     className={`absolute w-10 h-8 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-//                       answersList[currentRide][idx] ? "translate-x-full" : "translate-x-0"
-//                     }`}
-//                   />
-//                 </div>
-//               </div>
-//             </div>
-//           ))}
-
-//           <div className="sm:col-span-2 flex justify-center mt-6">
-//             <button
-//               onClick={handleSubmit}
-//               className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300"
-//             >
-//               Submit Ride {currentRide + 1}
-//             </button>
-//           </div>
-//         </div>
-
-//         {certificateReady && (
-//           <div className="mt-8 text-center">
-//             <img
-//               src="/battery_fill.gif"
-//               alt="Battery Full"
-//               className="mx-auto mb-4 w-32 animate-bounce"
-//             />
-//             <button className="px-6 py-3 bg-green-600 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-green-700">
-//               Download Certificate
-//             </button>
-//           </div>
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default QuestionTogglePage;

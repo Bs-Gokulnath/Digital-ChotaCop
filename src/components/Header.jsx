@@ -90,7 +90,7 @@ function Header() {
     <div className="bg-[#fdf5eb] py-4">
 
       {/* Session Links */}
-      <div className="flex justify-end px-6 mb-3">
+      {/* <div className="flex justify-end px-6 mb-3">
         {isLoggedIn ? (
           <button
             onClick={handleLogout}
@@ -114,7 +114,7 @@ function Header() {
             </Link>
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* Top Logos (visible only on md and larger) */}
       <div className="hidden md:flex justify-between items-center px-6">
