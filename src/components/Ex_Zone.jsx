@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 const experienceQuestions = [
   "Did you enjoy the ride?",
@@ -12,10 +12,7 @@ const parentQuestions = [
   "Did you feel the ride was safe for your family?"
 ];
 
-const Ex_Zone = () => {
-  const [answers, setAnswers] = useState(Array(experienceQuestions.length).fill(false));
-  const [parentAnswers, setParentAnswers] = useState(Array(parentQuestions.length).fill(false));
-
+const Ex_Zone = ({ answers, setAnswers, parentAnswers, setParentAnswers }) => {
   const handleToggle = (idx) => {
     const updated = [...answers];
     updated[idx] = !updated[idx];
@@ -41,8 +38,8 @@ const Ex_Zone = () => {
                 answers[idx] ? "bg-green-500" : "bg-red-500"
               }`}
             >
-              <span className="text-white text-xs font-bold w-1/2 text-center z-10">Yes</span>
-              <span className="text-white text-xs font-bold w-1/2 text-center z-10">No</span>
+              <span className="text-white text-xs font-bold w-1/2 text-center z-10">Y</span>
+              <span className="text-white text-xs font-bold w-1/2 text-center z-10">N</span>
               <div
                 className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
                   answers[idx] ? "translate-x-full" : "translate-x-0"
@@ -63,8 +60,8 @@ const Ex_Zone = () => {
                 parentAnswers[idx] ? "bg-green-500" : "bg-red-500"
               }`}
             >
-              <span className="text-white text-xs font-bold w-1/2 text-center z-10">Yes</span>
-              <span className="text-white text-xs font-bold w-1/2 text-center z-10">No</span>
+              <span className="text-white text-xs font-bold w-1/2 text-center z-10">Y</span>
+              <span className="text-white text-xs font-bold w-1/2 text-center z-10">N</span>
               <div
                 className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
                   parentAnswers[idx] ? "translate-x-full" : "translate-x-0"
