@@ -131,23 +131,48 @@ const QuestionTogglePage = () => {
   };
 
   const generateAndDownloadCertificate = async () => {
-    const { name, school, class: studentClass } = studentInfo;
+    const { name, school, class: studentClass, chapter } = studentInfo;
     const tempDiv = document.createElement("div");
     tempDiv.className =
       "relative w-[1123px] h-[794px] bg-white shadow-lg border rounded-lg overflow-hidden";
     tempDiv.style.width = "1123px";
     tempDiv.style.height = "794px";
+    // Load Shrikhand and Canvas Sans fonts
     tempDiv.innerHTML = `
-      <img src="/assets/Chota Cop Certificate.png" 
+      <link href="https://fonts.googleapis.com/css2?family=Shrikhand&display=swap" rel="stylesheet">
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Shrikhand&display=swap');
+        .shrikhand { font-family: 'Shrikhand', cursive; }
+        .canvas-sans { font-family: 'Arial', 'Helvetica Neue', Helvetica, 'Canvas Sans', sans-serif; }
+      </style>
+      <img src="/assets/Certificate Blank.png" 
            alt="Certificate" 
            style="width: 1123px; height: 794px; object-fit: cover; position: absolute; left: 0; top: 0;"/>
-      <div style="position: absolute; top: 378px; left: 345px; font-size: 24px; font-weight: bold; color: #222; width: 400px;">${name}</div>
-      <div style="position: absolute; top: 448px; left: 340px; font-size: 16px; font-weight: bold; color: #222; width: 300px;">${school}</div>
-      <div style="position: absolute; top: 438px; left: 750px; font-size: 24px; font-weight: bold; color: #222; width: 200px;">${studentClass}</div>
+      <div class="canvas-sans" style="position: absolute; top: 246px; left: 90px; font-size: 50px; font-weight: bold; color: #F7931E;">
+        Congratulations!
+      </div>
+      <div class="canvas-sans" style="position: absolute; top: 320px; left: 90px; font-size: 24px; color: #888;">
+        This is to certify
+      </div>
+      <div class="shrikhand" style="position: absolute; top: 344px; left: 90px; font-size: 40px; color: #2d1a4a;">
+        ${name}
+      </div>
+      <div class="canvas-sans" style="position: absolute; top: 410px; left: 90px; font-size: 24px; color: #888;">
+        of ${school}
+      </div>
+      <div class="canvas-sans" style="position: absolute; top: 440px; left: 90px; font-size: 24px; color: #888;">
+        in class ${studentClass} at ${chapter}
+      </div>
+      <div class="canvas-sans" style="position: absolute; top: 470px; left: 90px; font-size: 24px; color: #888;">
+        has successfully completed
+      </div>
+      <div class="canvas-sans" style="position: absolute; top: 510px; left: 90px; font-size: 32px; font-weight: bold; color: #222;">
+        Yi Chotacop
+      </div>
     `;
     document.body.appendChild(tempDiv);
-    await new Promise((resolve) => setTimeout(resolve, 200)); // Wait for image to load
-    return html2canvas(tempDiv, { scale: 3 }).then((canvas) => {
+    await new Promise((resolve) => setTimeout(resolve, 400)); // Wait for image and fonts to load
+    return html2canvas(tempDiv, { scale: 3, useCORS: true }).then((canvas) => {
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("landscape", "px", [1123, 794]);
       pdf.addImage(imgData, "PNG", 0, 0, 1123, 794);
