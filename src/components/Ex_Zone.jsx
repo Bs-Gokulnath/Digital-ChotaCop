@@ -12,14 +12,22 @@ const parentQuestions = [
   "Did you feel the ride was safe for your family?"
 ];
 
-const Ex_Zone = ({ answers, setAnswers, parentAnswers, setParentAnswers }) => {
+const Ex_Zone = ({ answers, setAnswers, parentAnswers, setParentAnswers, disabled }) => {
   const handleToggle = (idx) => {
+    if (disabled) {
+      alert('Please complete answering all 7 rides.');
+      return;
+    }
     const updated = [...answers];
     updated[idx] = !updated[idx];
     setAnswers(updated);
   };
 
   const handleParentToggle = (idx) => {
+    if (disabled) {
+      alert('Please complete all 7 ride checkboxes first.');
+      return;
+    }
     const updated = [...parentAnswers];
     updated[idx] = !updated[idx];
     setParentAnswers(updated);
@@ -34,15 +42,15 @@ const Ex_Zone = ({ answers, setAnswers, parentAnswers, setParentAnswers }) => {
             <span className="text-gray-800 font-medium text-base">{question}</span>
             <div
               onClick={() => handleToggle(idx)}
-              className={`relative w-14 h-6 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ml-4 ${
+              className={`relative w-16 h-7 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ml-4 ${
                 answers[idx] ? "bg-green-500" : "bg-red-500"
               }`}
             >
-              <span className="text-white text-xs font-bold w-1/2 text-center z-10">Y</span>
-              <span className="text-white text-xs font-bold w-1/2 text-center z-10">N</span>
+              <span className="text-white text-xs font-bold w-7 text-center z-10">Y</span>
+              <span className="text-white text-xs font-bold w-7 text-center z-10">N</span>
               <div
-                className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                  answers[idx] ? "translate-x-full" : "translate-x-0"
+                className={`absolute w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                  answers[idx] ? "translate-x-9" : "translate-x-0"
                 }`}
               />
             </div>
@@ -56,15 +64,15 @@ const Ex_Zone = ({ answers, setAnswers, parentAnswers, setParentAnswers }) => {
             <span className="text-gray-800 font-medium text-base">{question}</span>
             <div
               onClick={() => handleParentToggle(idx)}
-              className={`relative w-14 h-6 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ml-4 ${
+              className={`relative w-16 h-7 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ml-4 ${
                 parentAnswers[idx] ? "bg-green-500" : "bg-red-500"
               }`}
             >
-              <span className="text-white text-xs font-bold w-1/2 text-center z-10">Y</span>
-              <span className="text-white text-xs font-bold w-1/2 text-center z-10">N</span>
+              <span className="text-white text-xs font-bold w-7 text-center z-10">Y</span>
+              <span className="text-white text-xs font-bold w-7 text-center z-10">N</span>
               <div
-                className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                  parentAnswers[idx] ? "translate-x-full" : "translate-x-0"
+                className={`absolute w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                  parentAnswers[idx] ? "translate-x-9" : "translate-x-0"
                 }`}
               />
             </div>

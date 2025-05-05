@@ -46,6 +46,10 @@ const QuestionTogglePage = () => {
   const [submitted, setSubmitted] = useState(false);
 
   const handleToggle = (rideIdx, questionIdx) => {
+    if (!isStudentInfoComplete) {
+      alert('Please fill in all student information before answering.');
+      return;
+    }
     if (!rideActive[rideIdx]) {
       alert('Activate this ride by checking the box before answering.');
       return;
@@ -57,6 +61,10 @@ const QuestionTogglePage = () => {
   };
 
   const handleParentToggle = (rideIdx) => {
+    if (!isStudentInfoComplete) {
+      alert('Please fill in all student information before answering.');
+      return;
+    }
     if (!rideActive[rideIdx]) {
       alert('Activate this ride by checking the box before answering.');
       return;
@@ -256,9 +264,68 @@ const QuestionTogglePage = () => {
             </div>
             <select name="chapter" value={studentInfo.chapter} onChange={handleInputChange} className="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2">
               <option value="">Select Chapter</option>
-              <option value="1">Chapter 1</option>
-              <option value="2">Chapter 2</option>
-              <option value="3">Chapter 3</option>
+              <option value="Agra">Agra</option>
+              <option value="Ahmedabad">Ahmedabad</option>
+              <option value="Ajmer">Ajmer</option>
+              <option value="Amaravati">Amaravati</option>
+              <option value="Balasore">Balasore</option>
+              <option value="Bengaluru">Bengaluru</option>
+              <option value="Bhopal">Bhopal</option>
+              <option value="Bhavnagar">Bhavnagar</option>
+              <option value="Bhubaneswar">Bhubaneswar</option>
+              <option value="Chandigarh">Chandigarh</option>
+              <option value="Chennai">Chennai</option>
+              <option value="Chhatrapati Sambhajinagar">Chhatrapati Sambhajinagar</option>
+              <option value="Coimbatore">Coimbatore</option>
+              <option value="Dehradun">Dehradun</option>
+              <option value="Delhi">Delhi</option>
+              <option value="Dindigul">Dindigul</option>
+              <option value="Durg">Durg</option>
+              <option value="Erode">Erode</option>
+              <option value="Goa">Goa</option>
+              <option value="Gurugram">Gurugram</option>
+              <option value="Guwahati">Guwahati</option>
+              <option value="Gwalior">Gwalior</option>
+              <option value="Hosur">Hosur</option>
+              <option value="Hubballi">Hubballi</option>
+              <option value="Hyderabad">Hyderabad</option>
+              <option value="Indore">Indore</option>
+              <option value="Jaipur">Jaipur</option>
+              <option value="Jabalpur">Jabalpur</option>
+              <option value="Jamshedpur">Jamshedpur</option>
+              <option value="Kanpur">Kanpur</option>
+              <option value="Karur">Karur</option>
+              <option value="Kochi">Kochi</option>
+              <option value="Kolkata">Kolkata</option>
+              <option value="Kota">Kota</option>
+              <option value="Kozhikode">Kozhikode</option>
+              <option value="Lucknow">Lucknow</option>
+              <option value="Madurai">Madurai</option>
+              <option value="Mangaluru">Mangaluru</option>
+              <option value="Mumbai">Mumbai</option>
+              <option value="Mysuru">Mysuru</option>
+              <option value="Nagaland">Nagaland</option>
+              <option value="Nagpur">Nagpur</option>
+              <option value="Nashik">Nashik</option>
+              <option value="Noida">Noida</option>
+              <option value="Puducherry">Puducherry</option>
+              <option value="Pune">Pune</option>
+              <option value="Raipur">Raipur</option>
+              <option value="Rajkot">Rajkot</option>
+              <option value="Ranchi">Ranchi</option>
+              <option value="Salem">Salem</option>
+              <option value="Sikkim">Sikkim</option>
+              <option value="Siliguri">Siliguri</option>
+              <option value="Sivakasi">Sivakasi</option>
+              <option value="Surat">Surat</option>
+              <option value="Thoothukudi">Thoothukudi</option>
+              <option value="Tirupur">Tirupur</option>
+              <option value="Trichy">Trichy</option>
+              <option value="Trivandrum">Trivandrum</option>
+              <option value="Vadodara">Vadodara</option>
+              <option value="Varanasi">Varanasi</option>
+              <option value="Vellore">Vellore</option>
+              <option value="Vizag">Vizag</option>
             </select>
             <input type="text" name="name" placeholder="Name" value={studentInfo.name} onChange={handleInputChange} className="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2" />
             <input type="text" name="school" placeholder="School" value={studentInfo.school} onChange={handleInputChange} className="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2" />
@@ -275,13 +342,13 @@ const QuestionTogglePage = () => {
         <div className="bg-[#fdf5eb] shadow-xl rounded-2xl p-4 mb-8">
           <div className="hidden md:flex items-center">
             <p className="text-gray-800 font-semibold text-base mr-8 min-w-[260px]">Were you riding with a parent?</p>
-            <div className="flex items-center gap-18 ml-[270px]">
+            <div className="flex items-center gap-20 ml-[215px]">
               {Array.from({ length: TOTAL_RIDES }, (_, rideIdx) => {
                 const isAnswered = parentRideAnswers[rideIdx];
                 return (
                   <div
                     key={rideIdx}
-                    onClick={() => isStudentInfoComplete && handleParentToggle(rideIdx)}
+                    onClick={() => handleParentToggle(rideIdx)}
                     className={`relative w-14 h-6 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
                       isAnswered ? "bg-green-500" : "bg-red-500"
                     }`}
@@ -306,7 +373,7 @@ const QuestionTogglePage = () => {
                 return (
                   <div
                     key={rideIdx}
-                    onClick={() => isStudentInfoComplete && handleParentToggle(rideIdx)}
+                    onClick={() => handleParentToggle(rideIdx)}
                     className={`relative w-12 h-5 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
                       isAnswered ? "bg-green-500" : "bg-red-500"
                     }`}
@@ -326,7 +393,7 @@ const QuestionTogglePage = () => {
         {/* MOBILE VIEW */}
         <div className="md:hidden bg-[#fdf5eb] shadow-xl rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-2 font-bold text-gray-600 text-sm">
-            <span className="w-16">Ride</span>
+            {/* <span className="w-16">Ride</span>  */}
             {Array.from({ length: TOTAL_RIDES }, (_, i) => (
               <span key={i} className="w-12 text-center flex items-center justify-center gap-1">
                 {i + 1}
@@ -358,7 +425,7 @@ const QuestionTogglePage = () => {
                   return (
                     <div
                       key={rideIdx}
-                      onClick={() => isStudentInfoComplete && handleToggle(rideIdx, qIdx)}
+                      onClick={() => handleToggle(rideIdx, qIdx)}
                       className={`relative w-10 h-5 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
                         isAnswered ? "bg-green-500" : "bg-red-500"
                       }`}
@@ -407,7 +474,7 @@ const QuestionTogglePage = () => {
                     return (
                       <td key={rideIdx} className="p-4 text-center">
                         <div
-                          onClick={() => isStudentInfoComplete && handleToggle(rideIdx, qIdx)}
+                          onClick={() => handleToggle(rideIdx, qIdx)}
                           className={`relative w-14 h-6 rounded-full cursor-pointer transition-colors duration-300 mx-auto flex items-center px-1 ${
                             isAnswered ? "bg-green-500" : "bg-red-500"
                           }`}
